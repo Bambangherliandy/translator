@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#6C3FD4"/>
+<title>WE ARE ONE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#6C3FD4;--pl:#EDE9FB;--pd:#3C2475;
+  --teal:#1D9E75;--tl:#E1F5EE;
+  --bg:#F8F7FF;--white:#fff;--text:#1A1A2E;--muted:#6B7280;
+  --border:#E5E7EB;--radius:14px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:420px;margin:0 auto;display:flex;flex-direction:column;overflow-x:hidden}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* HEADER */
+header{background:var(--purple);color:#fff;padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo h1{font-size:15px;font-weight:700;letter-spacing:.4px;line-height:1.2}
+.logo small{font-size:10px;opacity:.75;display:block;font-weight:400}
+.hdr-actions{display:flex;gap:8px}
+.icon-btn{background:rgba(255,255,255,0.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:background .2s}
+.icon-btn:hover{background:rgba(255,255,255,0.28)}
+
+/* BOTTOM NAV */
+nav{background:var(--white);border-top:1px solid var(--border);display:flex;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;z-index:98}
+.nav-tab{flex:1;padding:8px 2px 10px;background:none;border:none;cursor:pointer;font-size:10px;font-weight:500;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;border-top:2px solid transparent;transition:all .2s}
+.nav-tab.active{color:var(--purple);border-top-color:var(--purple)}
+.nav-tab .ti{font-size:22px}
+
+/* PAGES */
+.page{display:none;padding:14px 14px 80px;flex:1;flex-direction:column;gap:14px}
+.page.active{display:flex}
+
+/* CARD */
+.card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:15px}
+.card-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+
+/* BUTTONS */
+.btn{padding:10px 18px;border-radius:30px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--purple);color:#fff}
+.btn-primary:hover{background:var(--pd)}
+.btn-outline{background:transparent;color:var(--purple);border:1.5px solid var(--purple)}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* TOGGLE */
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#D1D5DB;border-radius:24px;cursor:pointer;transition:.3s}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle input:checked+.toggle-slider{background:var(--purple)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(20px)}
+
+/* TOAST */
+.toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A1A2E;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── TRANSLATE ── */
+.camera-box{background:#111;border-radius:var(--radius);overflow:hidden;position:relative;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+video{width:100%;height:100%;object-fit:cover}
+.cam-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff}
+.cam-placeholder{font-size:44px;opacity:.4}
+.cam-text{font-size:13px;opacity:.6;text-align:center;padding:0 20px}
+.live-badge{position:absolute;top:10px;left:10px;background:#E24B4A;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;display:none}
+.live-badge.show{display:block;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.cam-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.lang-row{display:flex;align-items:center;gap:8px}
+.lang-row select{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--white);color:var(--text)}
+.result-box{background:var(--pl);border-radius:10px;padding:14px;min-height:68px;position:relative}
+.result-text{font-size:15px;color:var(--pd);line-height:1.5;font-weight:500}
+.result-ph{color:var(--muted);font-size:13px;font-style:italic}
+.speak-btn{position:absolute;bottom:10px;right:10px;background:var(--purple);border:none;color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.conf-bar{height:4px;background:#E5E7EB;border-radius:4px;overflow:hidden;margin-top:8px}
+.conf-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .5s;width:0}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-row h4{font-size:14px;font-weight:500}
+.setting-row p{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── GLOVE ── */
+.glove-card{background:linear-gradient(135deg,#EDE9FB,#E1F5EE);border-radius:var(--radius);padding:16px;border:1px solid #D4C9F5;position:relative;overflow:hidden}
+.status-dot{width:10px;height:10px;border-radius:50%;background:#E5E7EB;flex-shrink:0;transition:background .3s}
+.status-dot.on{background:var(--teal)}
+.status-dot.blink{background:#F59E0B;animation:pulse 1s infinite}
+.sensor-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.sensor-item{background:var(--white);border-radius:8px;padding:8px 4px;text-align:center;border:1px solid var(--border)}
+.sensor-val{font-size:15px;font-weight:700;color:var(--purple)}
+.sensor-label{font-size:9px;color:var(--muted);margin-top:2px}
+.feature-item{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--white);border-radius:10px;border:1px solid var(--border);margin-bottom:8px}
+.feature-icon{font-size:20px;flex-shrink:0}
+.feature-text h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.feature-text p{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ── HISTORY ── */
+.history-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.history-item:last-child{border-bottom:none}
+.history-icon{width:38px;height:38px;border-radius:10px;background:var(--pl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.history-meta{flex:1}
+.history-text{font-size:14px;font-weight:500;margin-bottom:2px}
+.history-time{font-size:11px;color:var(--muted)}
+.history-lang{font-size:10px;background:var(--tl);color:var(--teal);padding:2px 8px;border-radius:20px;display:inline-block;margin-top:3px}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:14px;text-align:center}
+.stat-num{font-size:24px;font-weight:700;color:var(--purple)}
+.stat-label{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── B2B ── */
+.qr-box{background:var(--purple);border-radius:var(--radius);padding:16px;color:#fff;text-align:center}
+.qr-box h3{font-size:14px;font-weight:600;margin-bottom:6px}
+.qr-box p{font-size:12px;opacity:.8;margin-bottom:12px}
+.install-btn{background:#fff;color:var(--purple);border:none;border-radius:20px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
+.plan-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.plan-card.featured{border:2px solid var(--purple);background:var(--pl)}
+
+/* ══════════════════════════════
+   LEARN PAGE
+══════════════════════════════ */
+.learn-tabs{display:flex;background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:4px;gap:4px}
+.ltab{flex:1;padding:8px 4px;border:none;border-radius:10px;background:transparent;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .2s}
+.ltab.active{background:var(--purple);color:#fff}
+
+/* progress */
+.prog-bar{height:6px;background:#E5E7EB;border-radius:6px;overflow:hidden;margin:6px 0 12px}
+.prog-fill{height:100%;background:var(--purple);border-radius:6px;transition:width .5s}
+.stats-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+.stat-mini{background:var(--pl);border-radius:10px;padding:8px 4px}
+.stat-mini .num{font-size:20px;font-weight:700;color:var(--purple)}
+.stat-mini .lbl{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* lesson list */
+.lesson-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--white);border-radius:12px;border:1px solid var(--border);cursor:pointer;transition:all .2s;margin-bottom:8px}
+.lesson-item:hover{border-color:var(--purple);background:var(--pl)}
+.lesson-thumb{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.lesson-info h3{font-size:14px;font-weight:600;margin-bottom:2px}
+.lesson-info p{font-size:11px;color:var(--muted)}
+.lbadge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600;display:inline-block;margin-top:4px}
+.lb-b{background:#E1F5EE;color:#0F6E56}
+.lb-i{background:#FFF3CD;color:#854F0B}
+.lb-a{background:#FAECE7;color:#993C1D}
+
+/* lesson detail */
+.lesson-detail{display:none;flex-direction:column;gap:14px}
+.lesson-detail.show{display:flex}
+.ld-hero{border-radius:var(--radius);padding:20px;text-align:center}
+.ld-emoji{font-size:56px;margin-bottom:8px}
+.ld-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+.ld-sub{font-size:13px;color:rgba(255,255,255,.8)}
+.sign-card{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:14px;margin-bottom:10px}
+.sign-card-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.sign-emoji-big{font-size:48px;width:70px;height:70px;background:var(--pl);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sign-name{font-size:16px;font-weight:700}
+.sign-phonetic{font-size:12px;color:var(--muted);margin-top:2px}
+.sign-steps{list-style:none;display:flex;flex-direction:column;gap:6px}
+.sign-step{display:flex;gap:10px;font-size:13px;line-height:1.45;color:var(--text)}
+.step-num{background:var(--purple);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px}
+.tip-box{background:#FFF3CD;border-radius:10px;padding:10px 12px;font-size:12px;color:#854F0B;margin-top:8px;border-left:3px solid #F59E0B}
+
+/* alphabet */
+.alpha-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.alpha-card{background:var(--white);border-radius:10px;border:1px solid var(--border);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.alpha-card:hover,.alpha-card.sel{background:var(--purple);border-color:var(--purple)}
+.alpha-card:hover .a-letter,.alpha-card.sel .a-letter,.alpha-card:hover .a-hand,.alpha-card.sel .a-hand{color:#fff}
+.a-letter{font-size:17px;font-weight:700}
+.a-hand{font-size:19px;color:var(--muted)}
+.alpha-detail{background:var(--pl);border-radius:12px;padding:16px;text-align:center;margin-top:8px}
+.alpha-detail .big{font-size:56px;margin-bottom:8px}
+.alpha-detail h3{font-size:18px;font-weight:700;color:var(--pd);margin-bottom:6px}
+.alpha-detail p{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* flashcards */
+.fc-counter{text-align:center;font-size:13px;color:var(--muted);margin-bottom:8px}
+.fc-card{background:var(--white);border-radius:20px;border:1px solid var(--border);min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;cursor:pointer;position:relative;transition:transform .15s}
+.fc-card:active{transform:scale(0.97)}
+.fc-emoji{font-size:64px;margin-bottom:10px}
+.fc-lbl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.fc-word{font-size:24px;font-weight:700}
+.fc-back{display:none;flex-direction:column;align-items:center;gap:6px}
+.fc-desc{font-size:13px;color:var(--muted);line-height:1.5;max-width:270px}
+.fc-hint{position:absolute;bottom:12px;right:14px;font-size:11px;color:var(--muted)}
+.fc-nav{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.fc-btn{padding:9px 20px;border-radius:30px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.fc-know{background:#E1F5EE;color:#0F6E56}
+.fc-again{background:#FAECE7;color:#993C1D}
+.fc-flip{background:var(--purple);color:#fff}
+.sess-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+
+/* quiz */
+.quiz-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.q-prog{flex:1;height:5px;background:#E5E7EB;border-radius:5px;overflow:hidden}
+.q-prog-fill{height:100%;background:var(--purple);border-radius:5px;transition:width .4s}
+.quiz-emoji{font-size:52px;text-align:center;margin:12px 0}
+.quiz-q{font-size:15px;font-weight:600;line-height:1.4;margin-bottom:14px}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.qopt{padding:12px 15px;border:1.5px solid var(--border);border-radius:12px;background:var(--white);cursor:pointer;font-size:14px;font-weight:500;text-align:left;transition:all .2s}
+.qopt:hover:not(.dis){border-color:var(--purple);background:var(--pl)}
+.qopt.correct{border-color:var(--teal);background:#E1F5EE;color:#0F6E56}
+.qopt.wrong{border-color:#E24B4A;background:#FCEBEB;color:#A32D2D}
+.qopt.dis{cursor:not-allowed}
+.qfb{padding:11px;border-radius:10px;font-size:13px;font-weight:500;margin-top:10px;display:none}
+.qfb.show{display:block}
+.qfb.ok{background:#E1F5EE;color:#0F6E56}
+.qfb.bad{background:#FCEBEB;color:#A32D2D}
+.quiz-result{text-align:center;padding:10px}
+.score-badge{display:inline-block;font-size:26px;font-weight:700;color:var(--purple);background:var(--pl);border-radius:50%;width:76px;height:76px;line-height:76px;margin:10px 0}
+</style>
+</head>
+<body>
+<h2 class="sr-only">WE ARE ONE – Sign Language AI Translator, Glove, Learn, History, and B2B app</h2>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🤝</div>
+    <div><h1>WE ARE ONE</h1><small>Sign Language AI · B2B Retail</small></div>
+  </div>
+  <div class="hdr-actions">
+    <button class="icon-btn" onclick="showToast('No new notifications')">🔔</button>
+    <button class="icon-btn" onclick="showPage('settings')">⚙️</button>
+  </div>
+</header>
+
+<!-- ══════════ TRANSLATE ══════════ -->
+<div id="page-translate" class="page active">
+  <div class="card">
+    <div class="card-title">📹 Camera Translator</div>
+    <div class="camera-box" id="camBox">
+      <video id="videoEl" autoplay playsinline muted></video>
+      <div class="cam-overlay" id="camOverlay">
+        <div class="cam-placeholder">🤟</div>
+        <div class="cam-text">Tap "Start Camera" to begin AI sign language detection</div>
+      </div>
+      <div class="live-badge" id="liveBadge">● LIVE</div>
+    </div>
+    <div class="cam-controls" style="margin-top:12px">
+      <button class="btn btn-primary" id="startCamBtn" onclick="startCamera()">📷 Start Camera</button>
+      <button class="btn btn-outline" id="stopCamBtn" onclick="stopCamera()" disabled>⏹ Stop</button>
+      <button class="btn btn-outline btn-sm" onclick="simulateDetect()">🤖 Demo AI</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌐 Output Language</div>
+    <div class="lang-row">
+      <select id="outputLang">
+        <option value="id">🇮🇩 Bahasa Indonesia</option>
+        <option value="en" selected>🇺🇸 English</option>
+        <option value="ms">🇲🇾 Bahasa Melayu</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="ar">🇸🇦 العربية</option>
+        <option value="hi">🇮🇳 हिन्दी</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="es">🇪🇸 Español</option>
+      </select>
+      <button style="background:var(--pl);border:none;color:var(--purple);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px" onclick="showToast('Sign language auto-detected')">🔄</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">💬 AI Translation Output</div>
+    <div class="result-box">
+      <div class="result-text" id="resultText"><span class="result-ph" id="resultPh">Translation will appear here in real-time...</span></div>
+      <button class="speak-btn" onclick="speakResult()">🔊</button>
+    </div>
+    <div class="conf-bar" style="margin-top:10px"><div class="conf-fill" id="confBar"></div></div>
+    <p style="font-size:11px;color:var(--muted);margin-top:5px">AI Confidence: <span id="confLabel">–</span></p>
+  </div>
+  <div class="card">
+    <div class="card-title">🔊 Voice Output</div>
+    <div class="setting-row"><div><h4>Auto-speak translation</h4></div><label class="toggle"><input type="checkbox" id="autoSpeak" checked><span class="toggle-slider"></span></label></div>
+    <div class="setting-row"><div><h4>Speed</h4></div><select style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px" id="speedSel"><option>Slow</option><option selected>Normal</option><option>Fast</option></select></div>
+    <div class="setting-row" style="border:none"><div><h4>Volume</h4></div><input type="range" min="0" max="100" value="80" style="width:120px" id="volSlider"></div>
+  </div>
+</div>
+
+<!-- ══════════ GLOVE ══════════ -->
+<div id="page-glove" class="page">
+  <div class="glove-card">
+    <h3 style="font-size:16px;font-weight:700;color:var(--pd)">🧤 Smart Glove Device</h3>
+    <p style="font-size:13px;color:var(--muted);margin-top:4px">Hardware-assisted translation via flex sensors</p>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+      <div class="status-dot" id="statusDot"></div>
+      <span style="font-size:13px;color:var(--muted)" id="statusText">Not connected</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="connectGlove()">🔗 Connect Bluetooth</button>
+      <button class="btn btn-outline btn-sm" onclick="showToast('🎯 Calibration started – hold hand flat')">🎯 Calibrate</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📡 Sensor Readings (5 fingers)</div>
+    <div class="sensor-grid">
+      <div class="sensor-item"><div class="sensor-val" id="f1">–</div><div class="sensor-label">Thumb</div></div>
+      <div class="sensor-item"><div class="sensor-val" id="f2">–</div><div class="sensor-label">Index</div></div>
+      <div class="sensor-item"><div class="sensor-val" id="f3">–</div><div class="sensor-label">Middle</div></div>
+      <div class="sensor-item"><div class="sensor-val" id="f4">–</div><div class="sensor-label">Ring</div></div>
+      <div class="sensor-item"><div class="sensor-val" id="f5">–</div><div class="sensor-label">Pinky</div></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="card-title">🤖 Gesture Detected</div>
+      <div class="result-box"><div class="result-text" id="gloveResult"><span class="result-ph">Waiting for glove input...</span></div><button class="speak-btn" onclick="speakGlove()">🔊</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🧤 Glove Specs</div>
+    <div class="feature-item"><span class="feature-icon">⚡</span><div class="feature-text"><h4>BLE 5.0 · &lt;50ms latency</h4><p>Low-latency wireless, 10m range in retail environment</p></div></div>
+    <div class="feature-item"><span class="feature-icon">🔋</span><div class="feature-text"><h4>8-hour battery</h4><p>Full shift coverage without recharging</p></div></div>
+    <div class="feature-item"><span class="feature-icon">🌍</span><div class="feature-text"><h4>ASL, BSL, BISINDO + 12 more</h4><p>Multi-standard sign language recognition</p></div></div>
+  </div>
+</div>
+
+<!-- ══════════ LEARN ══════════ -->
+<div id="page-learn" class="page">
+  <!-- learn tab bar -->
+  <div class="learn-tabs">
+    <button class="ltab active" onclick="switchLearn('overview')">📖 Lessons</button>
+    <button class="ltab" onclick="switchLearn('alphabet')">🔤 Alphabet</button>
+    <button class="ltab" onclick="switchLearn('flashcards')">🃏 Cards</button>
+    <button class="ltab" onclick="switchLearn('quiz')">🧠 Quiz</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="lv-overview">
+    <div class="card">
+      <div class="card-title">Your progress</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Overall</span><span style="font-weight:600;color:var(--purple)" id="overallPct">0%</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="overallBar" style="width:0%"></div></div>
+      <div class="stats-3">
+        <div class="stat-mini"><div class="num" id="doneCount">0</div><div class="lbl">Lessons done</div></div>
+        <div class="stat-mini"><div class="num">5🔥</div><div class="lbl">Day streak</div></div>
+        <div class="stat-mini"><div class="num" id="pointsCount">0</div><div class="lbl">Points</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Retail sign language topics</div>
+      <div id="lessonList"></div>
+    </div>
+  </div>
+
+  <!-- LESSON DETAIL -->
+  <div id="lv-detail" style="display:none">
+    <button onclick="backToOverview()" style="background:var(--pl);border:none;color:var(--purple);padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px">← Back to lessons</button>
+    <div class="ld-hero" id="ldHero">
+      <div class="ld-emoji" id="ldEmoji"></div>
+      <div class="ld-title" id="ldTitle"></div>
+      <div class="ld-sub" id="ldSub"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Introduction</div>
+      <p id="ldIntro" style="font-size:14px;line-height:1.6;color:var(--text)"></p>
+    </div>
+    <div class="card">
+      <div class="card-title">Signs in this lesson – step-by-step</div>
+      <div id="ldSigns"></div>
+    </div>
+    <div class="card" style="text-align:center">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:14px">Ready to practise what you learned?</p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="switchLearn('flashcards')">🃏 Flashcards</button>
+        <button class="btn btn-outline btn-sm" onclick="switchLearn('quiz')">🧠 Quiz</button>
+        <button class="btn btn-primary btn-sm" onclick="markDone()">✅ Mark Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALPHABET -->
+  <div id="lv-alphabet" style="display:none">
+    <div class="card">
+      <div class="card-title">Sign language alphabet – tap any letter</div>
+      <div class="alpha-grid" id="alphaGrid"></div>
+      <div class="alpha-detail" id="alphaDetail" style="display:none">
+        <div class="big" id="adEmoji"></div>
+        <h3 id="adLetter"></h3>
+        <p id="adDesc"></p>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="speakLetter()">🔊 Hear letter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div id="lv-flashcards" style="display:none">
+    <div class="card">
+      <div class="card-title">Flashcard practice</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <select id="deckSelect" onchange="loadDeck()" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
+          <option value="greetings">👋 Greetings</option>
+          <option value="shopping">🛍️ Shopping</option>
+          <option value="numbers">🔢 Numbers</option>
+          <option value="colors">🎨 Colors</option>
+          <option value="alphabet">🔤 Alphabet A–F</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="shuffleDeck()">🔀</button>
+      </div>
+      <div class="fc-counter" id="fcCounter">Card 1 of 6</div>
+      <div class="fc-card" id="fcCard" onclick="flipCard()">
+        <div id="fcFront"><div class="fc-emoji" id="fcEmoji">👋</div><div class="fc-lbl">What sign is this?</div><div class="fc-word" id="fcWord">Hello</div></div>
+        <div class="fc-back" id="fcBack"><div class="fc-emoji" id="fcBEmoji"></div><div class="fc-word" id="fcBWord" style="margin-bottom:4px"></div><div class="fc-desc" id="fcDesc"></div></div>
+        <div class="fc-hint" id="fcHint">Tap to flip</div>
+      </div>
+      <div class="fc-nav" id="fcNavF"><button class="fc-btn fc-flip" onclick="flipCard()">👀 Reveal answer</button></div>
+      <div class="fc-nav" id="fcNavB" style="display:none">
+        <button class="fc-btn fc-again" onclick="rateCard(false)">🔁 Again</button>
+        <button class="fc-btn fc-know" onclick="rateCard(true)">✅ Got it!</button>
+      </div>
+      <div id="fcResult" style="display:none;text-align:center;padding:10px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Session stats</div>
+      <div class="sess-stats">
+        <div class="stat-mini"><div class="num" id="fcKnown">0</div><div class="lbl">Got it</div></div>
+        <div class="stat-mini"><div class="num" id="fcAgain">0</div><div class="lbl">Again</div></div>
+        <div class="stat-mini"><div class="num" id="fcLeft">–</div><div class="lbl">Left</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="lv-quiz" style="display:none">
+    <div class="card" id="quizCard">
+      <div class="quiz-hdr">
+        <span style="font-size:12px;color:var(--muted)" id="qNum">Q 1/6</span>
+        <div class="q-prog"><div class="q-prog-fill" id="qProg" style="width:0%"></div></div>
+        <span style="font-size:13px;color:var(--purple);font-weight:600" id="qScore">0 pts</span>
+      </div>
+      <div class="quiz-emoji" id="qEmoji">👋</div>
+      <div class="quiz-q" id="qQ"></div>
+      <div class="quiz-opts" id="qOpts"></div>
+      <div class="qfb" id="qFb"></div>
+      <button class="btn btn-primary" id="qNext" onclick="nextQ()" style="margin-top:12px;display:none;width:100%;justify-content:center">Next →</button>
+    </div>
+    <div id="quizResult" style="display:none">
+      <div class="card quiz-result">
+        <div style="font-size:48px" id="qREmoji">🎉</div>
+        <h2 style="font-size:19px;font-weight:700;margin:8px 0 4px" id="qRTitle"></h2>
+        <div class="score-badge" id="qRScore"></div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px" id="qRMsg"></p>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="startQuiz()">🔄 Try again</button>
+          <button class="btn btn-primary btn-sm" onclick="switchLearn('flashcards')">🃏 More practice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ HISTORY ══════════ -->
+<div id="page-history" class="page">
+  <div class="card">
+    <div class="card-title">📋 Translation History</div>
+    <div class="history-item"><div class="history-icon">🤟</div><div class="history-meta"><div class="history-text">"I'd like to try this jacket in size M"</div><div class="history-time">Today, 14:32 · Camera</div><div class="history-lang">🇺🇸 English</div></div></div>
+    <div class="history-item"><div class="history-icon">🧤</div><div class="history-meta"><div class="history-text">"Where is the cashier?"</div><div class="history-time">Today, 13:15 · Smart Glove</div><div class="history-lang">🇮🇩 Indonesia</div></div></div>
+    <div class="history-item"><div class="history-icon">🤟</div><div class="history-meta"><div class="history-text">"Do you have this in blue?"</div><div class="history-time">Today, 11:47 · Camera</div><div class="history-lang">🇺🇸 English</div></div></div>
+    <div class="history-item"><div class="history-icon">🧤</div><div class="history-meta"><div class="history-text">"Can I get a receipt please?"</div><div class="history-time">Yesterday, 16:22 · Smart Glove</div><div class="history-lang">🇲🇾 Melayu</div></div></div>
+    <button class="btn btn-outline btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="showToast('History exported to PDF')">📥 Export History</button>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Analytics</div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-num">247</div><div class="stat-label">Translations this month</div></div>
+      <div class="stat-card"><div class="stat-num">98%</div><div class="stat-label">AI accuracy</div></div>
+      <div class="stat-card"><div class="stat-num">11</div><div class="stat-label">Languages used</div></div>
+      <div class="stat-card"><div class="stat-num">4.8★</div><div class="stat-label">Customer satisfaction</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ B2B ══════════ -->
+<div id="page-business" class="page">
+  <div class="qr-box">
+    <h3>🏪 Retail Kiosk Mode</h3>
+    <p>Install on a tablet at checkout or service desk. Customers scan to open on their phone.</p>
+    <div style="width:80px;height:80px;background:#fff;border-radius:8px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:36px">📱</div>
+    <button class="install-btn" onclick="triggerInstall()">⬇️ Install as App</button>
+  </div>
+  <div class="card">
+    <div class="card-title">📈 Business Impact</div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-num">2.3M+</div><div class="stat-label">Deaf shoppers in Indonesia</div></div>
+      <div class="stat-card"><div class="stat-num">+38%</div><div class="stat-label">Satisfaction lift</div></div>
+      <div class="stat-card"><div class="stat-num">72%</div><div class="stat-label">Fewer miscommunications</div></div>
+      <div class="stat-card"><div class="stat-num">6mo</div><div class="stat-label">ROI payback period</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">💼 Pricing Plans</div>
+    <div class="plan-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><h3 style="font-size:15px;font-weight:600">Starter</h3><p style="font-size:12px;color:var(--muted)">1 store · 5 staff</p></div><div style="text-align:right"><div style="font-size:18px;font-weight:700;color:var(--purple)">Rp 299K</div><div style="font-size:11px;color:var(--muted)">/month</div></div></div></div>
+    <div class="plan-card featured"><div style="font-size:10px;background:var(--purple);color:#fff;padding:2px 10px;border-radius:20px;display:inline-block;margin-bottom:6px;font-weight:600">MOST POPULAR</div><div style="display:flex;justify-content:space-between;align-items:center"><div><h3 style="font-size:15px;font-weight:600">Business</h3><p style="font-size:12px;color:var(--muted)">5 stores · unlimited + Glove</p></div><div style="text-align:right"><div style="font-size:18px;font-weight:700;color:var(--purple)">Rp 899K</div><div style="font-size:11px;color:var(--muted)">/month</div></div></div></div>
+    <div class="plan-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><h3 style="font-size:15px;font-weight:600">Enterprise</h3><p style="font-size:12px;color:var(--muted)">Unlimited + API</p></div><div style="text-align:right"><div style="font-size:18px;font-weight:700;color:var(--purple)">Custom</div></div></div></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="showToast('Opening contact form...')">📩 Get a Free Demo</button>
+  </div>
+</div>
+
+<!-- ══════════ SETTINGS ══════════ -->
+<div id="page-settings" class="page">
+  <div class="card">
+    <div class="card-title">⚙️ App Settings</div>
+    <div class="setting-row"><div><h4>Auto-detect sign language</h4><p>AI continuously monitors camera feed</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+    <div class="setting-row"><div><h4>Haptic feedback (glove)</h4><p>Vibrate on successful detect</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+    <div class="setting-row"><div><h4>Save translation history</h4><p>Store translations locally</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+    <div class="setting-row" style="border:none"><div><h4>On-device AI processing</h4><p>More private, uses more battery</p></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌍 Sign Language Standard</div>
+    <select style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px">
+      <option>BISINDO (Indonesian Sign Language)</option>
+      <option>SIBI (Sistem Isyarat Bahasa Indonesia)</option>
+      <option>ASL (American Sign Language)</option>
+      <option>BSL (British Sign Language)</option>
+    </select>
+  </div>
+  <div class="card" style="text-align:center">
+    <div style="font-size:28px;margin-bottom:8px">🤝</div>
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:4px">WE ARE ONE v1.0.0</h3>
+    <p style="font-size:12px;color:var(--muted)">Making every retail experience inclusive</p>
+    <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="triggerInstall()">⬇️ Install App</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav role="tablist">
+  <button class="nav-tab active" onclick="showPage('translate')" role="tab"><span class="ti">🎥</span>Translate</button>
+  <button class="nav-tab" onclick="showPage('glove')" role="tab"><span class="ti">🧤</span>Glove</button>
+  <button class="nav-tab" onclick="showPage('learn')" role="tab"><span class="ti">📚</span>Learn</button>
+  <button class="nav-tab" onclick="showPage('history')" role="tab"><span class="ti">📋</span>History</button>
+  <button class="nav-tab" onclick="showPage('business')" role="tab"><span class="ti">🏪</span>B2B</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────
+const LESSONS=[
+  {id:'greetings',emoji:'👋',color:'#6C3FD4',title:'Greetings & Introductions',level:'Beginner',duration:'15 min',
+   intro:'Greetings are the first step to inclusive retail. These signs let your staff say hello, thank customers, and make a great first impression with deaf or hard-of-hearing shoppers.',
+   signs:[
+    {emoji:'👋',name:'Hello',phonetic:'HAI / HALO',steps:['Hold your right hand up at shoulder height, palm facing outward.','Open all five fingers wide.','Wave your hand gently left and right two times.','Keep your expression warm and make eye contact.'],tip:'This is the most important sign – practice until it feels natural.'},
+    {emoji:'🙏',name:'Thank you',phonetic:'TERIMA KASIH',steps:['Bring your flat right hand to your chin, fingertips touching your chin.','Move your hand forward and slightly downward, away from your face.','End with palm facing up, as if offering thanks.'],tip:'Adding a smile makes this sign feel much more genuine.'},
+    {emoji:'👋',name:'Goodbye',phonetic:'SAMPAI JUMPA',steps:['Hold your open hand at shoulder height, palm facing the person.','Bend all four fingers down toward your palm, then straighten them.','Repeat this folding motion two to three times, like a gentle wave.'],tip:'This is similar to Hello – context and timing tell them apart.'},
+    {emoji:'😊',name:'Nice to meet you',phonetic:'SENANG BERTEMU',steps:['Extend both hands in front of you, palms facing up.','Move both hands slightly toward each other.','Then pull them gently apart, ending with a small open gesture.'],tip:'Pair this with a nod for extra warmth.'},
+  ]},
+  {id:'shopping',emoji:'🛍️',color:'#1D9E75',title:'Shopping & Buying',level:'Beginner',duration:'25 min',
+   intro:'These are the most critical retail signs. They let deaf customers ask about prices, express intent to buy, choose payment methods, and request a receipt without any frustration.',
+   signs:[
+    {emoji:'💰',name:'How much? / Price',phonetic:'BERAPA HARGANYA?',steps:['Hold your dominant hand in front of you, fingers loosely together.','Rub your thumb across the tips of your fingers in small circular motions.','Raise your eyebrows – this signals a question in sign language.'],tip:'Raised eyebrows are essential here. Without them it reads as a statement, not a question.'},
+    {emoji:'🛒',name:'I want to buy this',phonetic:'SAYA MAU BELI INI',steps:['Point to yourself with your index finger (I / me).','Then make a gentle grabbing motion with your hand, pulling toward your body (want / take).','Finally, point clearly at the product (this).'],tip:'Pointing at the actual product makes this very clear in a store context.'},
+    {emoji:'💳',name:'Pay by card',phonetic:'BAYAR DENGAN KARTU',steps:['Hold your non-dominant hand flat, palm up – this is the "card reader".','With your dominant hand, mime swiping a card across it from left to right.','Alternatively, tap your index finger on your palm for contactless payment.'],tip:'Most modern customers recognise the tap gesture for contactless.'},
+    {emoji:'🧾',name:'Receipt',phonetic:'KWITANSI / STRUK',steps:['Hold your non-dominant hand flat, palm up.','With your dominant hand, run your fingertips across the palm slowly.','This mimics reading text printed on a receipt.'],tip:'Point to the receipt printer after this sign to reinforce the meaning.'},
+  ]},
+  {id:'numbers',emoji:'🔢',color:'#854F0B',title:'Numbers & Prices',level:'Beginner',duration:'20 min',
+   intro:'Numbers are essential for communicating prices, sizes, and quantities. Master 1 through 20 and you can handle most retail transactions.',
+   signs:[
+    {emoji:'1️⃣',name:'Numbers 1–5',phonetic:'SATU SAMPAI LIMA',steps:['1 – Hold up only your index finger.','2 – Index and middle finger extended, like a peace sign.','3 – Thumb, index, and middle finger extended.','4 – All fingers except the thumb extended.','5 – All five fingers spread wide open.'],tip:'These are the same in most sign languages worldwide.'},
+    {emoji:'6️⃣',name:'Numbers 6–9',phonetic:'ENAM SAMPAI SEMBILAN',steps:['6 – Touch pinky to thumb, other fingers up.','7 – Touch ring finger to thumb, others up.','8 – Touch middle finger to thumb, others up.','9 – Touch index finger to thumb (like OK), others up.'],tip:'Practice this sequence as a smooth flowing motion.'},
+    {emoji:'🔟',name:'Ten & beyond',phonetic:'SEPULUH KE ATAS',steps:['10 – Make a fist with your thumb up, then shake it once.','11 – Flick your index finger up from a fist twice.','20 – Make a claw with index and thumb, open and close it.','For larger numbers, sign each digit one at a time clearly.'],tip:'For prices like "Rp 50,000" sign 5-0-0-0-0 or use the "50 ribu" shorthand.'},
+  ]},
+  {id:'colors',emoji:'🎨',color:'#993C1D',title:'Colors & Descriptions',level:'Beginner',duration:'12 min',
+   intro:'Customers often need to describe the color or size of what they want. These signs help your staff understand and respond quickly.',
+   signs:[
+    {emoji:'🔴',name:'Red',phonetic:'MERAH',steps:['Point your index finger at your lips.','Draw it straight downward once, like you are marking the red color of lips.'],tip:'Think of it as pointing to the natural red of your lips.'},
+    {emoji:'🔵',name:'Blue',phonetic:'BIRU',steps:['Form the letter B with your hand – four fingers together pointing up, thumb tucked in.','Shake the B handshape side to side two times at chest height.'],tip:'The shaking motion distinguishes colors from letters.'},
+    {emoji:'🟡',name:'Yellow',phonetic:'KUNING',steps:['Form the letter Y – extend your thumb and pinky, curl other fingers in.','Shake the Y handshape side to side two times.'],tip:'Y for Yellow – easy to remember!'},
+    {emoji:'🟢',name:'Green',phonetic:'HIJAU',steps:['Form the letter G – extend your index finger and thumb horizontally.','Shake the G handshape side to side two times.'],tip:'G for Green – same pattern as other colors.'},
+  ]},
+  {id:'directions',emoji:'🗺️',color:'#3C2475',title:'Store Directions',level:'Intermediate',duration:'18 min',
+   intro:'Guide customers confidently through your store. These signs prevent confusion and save time for both your staff and deaf shoppers.',
+   signs:[
+    {emoji:'➡️',name:'This way / Go there',phonetic:'KE SANA / KE SINI',steps:['Extend your index finger and point clearly in the direction.','Move your whole arm slightly in that direction for emphasis.','For "this way, follow me" – beckon with your whole hand, palm up.'],tip:'Clear, confident pointing is universally understood across sign languages.'},
+    {emoji:'🚻',name:'Fitting room',phonetic:'KAMAR PAS',steps:['First sign ROOM – hold both flat hands facing each other, move them to form four walls of a box.','Then mime pulling a shirt over your head or buttoning up a garment.'],tip:'Pointing toward the actual fitting room immediately after the sign is very helpful.'},
+    {emoji:'💵',name:'Cashier / Checkout',phonetic:'KASIR',steps:['Rub thumb against fingers (money sign).','Then point in the direction of the cashier or cash desk.'],tip:'In a busy store, this two-part sign is much clearer than pointing alone.'},
+    {emoji:'🚪',name:'Exit / Entrance',phonetic:'KELUAR / MASUK',steps:['For EXIT – make a fist, then open it and flick fingers outward (like leaving).','For ENTRANCE – cup your hand and draw it inward toward your body.'],tip:'Point at the actual door while signing to remove all ambiguity.'},
+  ]},
+  {id:'assistance',emoji:'🆘',color:'#993556',title:'Asking for Help',level:'Advanced',duration:'22 min',
+   intro:'These signs handle the most challenging retail moments – when a customer has a problem, needs a manager, or wants to make a return. Knowing these builds real trust.',
+   signs:[
+    {emoji:'🙋',name:'Please help me',phonetic:'TOLONG BANTU SAYA',steps:['Hold both hands flat in front of you, palms facing up.','Lift them slightly upward in a gentle presenting motion.','This is a universal gesture of requesting assistance.'],tip:'A calm, open expression matters as much as the sign itself here.'},
+    {emoji:'↩️',name:'Return / Exchange',phonetic:'KEMBALIKAN / TUKAR',steps:['Hold the item or point to it clearly first.','Then move your dominant hand back and forth between yourself and an imaginary counter.','The back-and-forth movement signals exchange or return.'],tip:'Showing the actual product while signing this makes it unmistakable.'},
+    {emoji:'👔',name:'Manager',phonetic:'MANAJER',steps:['Tap your shoulder twice with your index finger.','This represents rank or authority – the person in charge.'],tip:'Follow this with a questioning expression (eyebrows raised) if you are asking "can I speak to the manager?".'},
+    {emoji:'😕',name:'Problem / Issue',phonetic:'MASALAH',steps:['Make a fist with your dominant hand, index finger extended and bent slightly.','Twist this handshape back and forth at the wrist two times.'],tip:'Pair this with a concerned expression so the customer knows you understand their frustration.'},
+  ]},
+];
+
+const ALPHA={
+  A:{e:'✊',d:'Make a fist, thumb resting on the side of your index finger.'},
+  B:{e:'🖐',d:'Four fingers together pointing up, thumb tucked into your palm.'},
+  C:{e:'🤏',d:'Curve all fingers and thumb into a C shape, like holding a cup.'},
+  D:{e:'👆',d:'Touch middle, ring, and pinky to your thumb. Index finger points straight up.'},
+  E:{e:'✋',d:'Bend all fingers so the tips touch the top of your palm, thumb tucked under.'},
+  F:{e:'👌',d:'Touch your index finger and thumb together. Other three fingers spread out.'},
+  G:{e:'👉',d:'Index finger and thumb extended horizontally pointing sideways, like a lowercase g.'},
+  H:{e:'🤞',d:'Index and middle fingers extended together, pointing sideways.'},
+  I:{e:'🤙',d:'Extend only your pinky finger. All other fingers closed in a fist.'},
+  J:{e:'🤙',d:'Make the I shape, then draw a J curve in the air downward and hook at the end.'},
+  K:{e:'✌️',d:'Index and middle fingers up and spread. Thumb between them pointing out.'},
+  L:{e:'🤙',d:'Extend your thumb and index finger at a right angle – like the letter L.'},
+  M:{e:'✊',d:'Fold your index, middle, and ring fingers over your tucked-in thumb.'},
+  N:{e:'✊',d:'Fold your index and middle fingers over your tucked-in thumb.'},
+  O:{e:'👌',d:'Curve all fingers and thumb to meet at the tips, forming a circle.'},
+  P:{e:'🤙',d:'Like the K handshape but rotated downward, pointing toward the floor.'},
+  Q:{e:'👇',d:'Like the G handshape but pointing downward toward the floor.'},
+  R:{e:'🤞',d:'Cross your index finger over your middle finger.'},
+  S:{e:'✊',d:'Make a fist with your thumb folded over the front of your fingers.'},
+  T:{e:'👍',d:'Make a fist with your thumb tucked between your index and middle fingers.'},
+  U:{e:'✌️',d:'Index and middle fingers extended together, pointing straight up.'},
+  V:{e:'✌️',d:'Index and middle fingers up and spread apart in a V or peace sign.'},
+  W:{e:'🖖',d:'Spread your index, middle, and ring fingers apart, forming a W shape.'},
+  X:{e:'☝️',d:'Bend your index finger into a hook or curved shape.'},
+  Y:{e:'🤙',d:'Extend thumb and pinky finger. Keep other three fingers folded down.'},
+  Z:{e:'☝️',d:'Use your index finger to trace the shape of a Z in the air.'},
+};
+
+const DECKS={
+  greetings:[
+    {e:'👋',w:'Hello',d:'Open hand, wave gently left and right at shoulder height.'},
+    {e:'🙏',w:'Thank you',d:'Flat hand from chin, move forward and slightly down.'},
+    {e:'👋',w:'Goodbye',d:'Open hand, fold fingers down and straighten repeatedly.'},
+    {e:'😊',w:'Nice to meet you',d:'Both hands open, palms up, move toward each other then apart.'},
+    {e:'🤝',w:'Welcome',d:'Open arms slightly, palms up – an inviting gesture.'},
+    {e:'❓',w:'How are you?',d:'Point to person, thumbs up, then raise eyebrows as a question.'},
+  ],
+  shopping:[
+    {e:'💰',w:'How much?',d:'Rub thumb across fingertips in circular motion. Raise eyebrows.'},
+    {e:'🛒',w:'Buy this',d:'Point to yourself, make grabbing motion, point to item.'},
+    {e:'💳',w:'Pay by card',d:'Mime swiping or tapping a card on your flat palm.'},
+    {e:'🧾',w:'Receipt',d:'Run fingertips across flat palm, like reading a printout.'},
+    {e:'🔄',w:'Exchange',d:'Move hand back and forth between yourself and the counter.'},
+    {e:'🏷️',w:'Price tag',d:'Tap wrist (like a watch), then show the number amount.'},
+  ],
+  numbers:[
+    {e:'1️⃣',w:'One',d:'Index finger pointing up, all others closed.'},
+    {e:'2️⃣',w:'Two',d:'Index and middle finger up in a V shape.'},
+    {e:'3️⃣',w:'Three',d:'Thumb, index, and middle finger extended.'},
+    {e:'5️⃣',w:'Five',d:'All five fingers spread open wide.'},
+    {e:'🔟',w:'Ten',d:'Shake a fist with thumb pointing up once.'},
+    {e:'💯',w:'One hundred',d:'Index finger (one), then open flat hand (hundred marker).'},
+  ],
+  colors:[
+    {e:'🔴',w:'Red',d:'Index finger brushes down from lips once.'},
+    {e:'🔵',w:'Blue',d:'B handshape, shake side to side twice.'},
+    {e:'🟡',w:'Yellow',d:'Y handshape, shake side to side twice.'},
+    {e:'🟢',w:'Green',d:'G handshape, shake side to side twice.'},
+    {e:'⚫',w:'Black',d:'Index finger draws across forehead left to right.'},
+    {e:'⚪',w:'White',d:'Open hand on chest, pull outward closing fingers.'},
+  ],
+  alphabet:[
+    {e:'✊',w:'A',d:'Make a fist, thumb resting on side of index finger.'},
+    {e:'🖐',w:'B',d:'Four fingers together pointing up, thumb tucked in.'},
+    {e:'🤏',w:'C',d:'Curve hand into a C shape like holding a cup.'},
+    {e:'👆',w:'D',d:'Middle/ring/pinky touch thumb; index points up.'},
+    {e:'✋',w:'E',d:'Bend all fingers so tips touch top of palm.'},
+    {e:'👌',w:'F',d:'Touch index and thumb together; other fingers spread.'},
+  ],
+};
+
+const QUIZ_POOL=[
+  {e:'👋',q:'What does this hand sign mean?',a:'Hello',opts:['Hello','Goodbye','Thank you','Help me']},
+  {e:'🙏',q:'What does this gesture represent?',a:'Thank you',opts:['Sorry','Thank you','Please','Yes']},
+  {e:'💰',q:'A customer makes this sign – what do they want to know?',a:'How much?',opts:['Where is it?','How much?','Can I try?','What color?']},
+  {e:'🔵',q:'A shopper shakes their hand like this – what color are they asking about?',a:'Blue',opts:['Green','Red','Blue','White']},
+  {e:'🛒',q:'This sign in a retail context means:',a:'I want to buy',opts:['I want to return','I want to buy','I need help','Where is checkout?']},
+  {e:'➡️',q:'Staff makes this directional sign – what does it mean?',a:'This way',opts:['No','Stop','This way','Over there']},
+  {e:'💳',q:'Customer mimes this motion – what are they asking?',a:'Pay by card',opts:['Pay by cash','Receipt please','Pay by card','Discount?']},
+  {e:'🔟',q:'What number does this handshape represent?',a:'Ten',opts:['Five','Eight','Ten','Twenty']},
+];
+
+// ─── STATE ──────────────────────────────────────────────
+let doneLessons=new Set(),points=0,currentLesson=null,selectedAlpha=null;
+let fcDeck=[],fcIdx=0,fcFlipped=false,fcKnown=0,fcAgain=0;
+let quizQs=[],quizIdx=0,quizScore=0,quizAnswered=false;
+let camStream=null,detectInterval=null,gloveInterval=null,deferredPrompt=null;
+
+const PHRASES=["I'd like to try this in a different size","Can you help me find this product?","How much does this cost?","I want to pay by card","Where is the fitting room?","Do you have this in another color?","I need a receipt please","Thank you for your help"];
+
+// ─── PAGE NAV ───────────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const tabs=['translate','glove','learn','history','business'];
+  const idx=tabs.indexOf(id);
+  if(idx>=0)document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+}
+
+// ─── LEARN NAV ──────────────────────────────────────────
+const LV=['overview','detail','alphabet','flashcards','quiz'];
+function switchLearn(view){
+  LV.forEach(v=>{
+    const el=document.getElementById('lv-'+v);
+    if(el)el.style.display='none';
+  });
+  document.getElementById('lv-'+view).style.display='block';
+  document.querySelectorAll('.ltab').forEach((t,i)=>{
+    const map=['overview','alphabet','flashcards','quiz'];
+    t.classList.toggle('active',map[i]===view);
+  });
+  if(view==='flashcards'&&!fcDeck.length)loadDeck();
+  if(view==='quiz')startQuiz();
+  if(view==='alphabet')renderAlpha();
+}
+
+function backToOverview(){
+  document.getElementById('lv-detail').style.display='none';
+  document.getElementById('lv-overview').style.display='block';
+}
+
+// ─── LESSONS ────────────────────────────────────────────
+function renderLessons(){
+  const list=document.getElementById('lessonList');
+  list.innerHTML='';
+  LESSONS.forEach(l=>{
+    const done=doneLessons.has(l.id);
+    const div=document.createElement('div');
+    div.className='lesson-item';
+    div.innerHTML=`<div class="lesson-thumb" style="background:${l.color}">${l.emoji}</div><div class="lesson-info"><h3>${l.title}</h3><p>${l.duration} · ${l.signs.length} key signs</p><span class="lbadge ${l.level==='Beginner'?'lb-b':l.level==='Intermediate'?'lb-i':'lb-a'}">${l.level}</span></div><div style="font-size:20px">${done?'✅':'›'}</div>`;
+    div.onclick=()=>openLesson(l);
+    list.appendChild(div);
+  });
+  updateProgress();
+}
+
+function openLesson(l){
+  currentLesson=l;
+  document.getElementById('lv-overview').style.display='none';
+  const hero=document.getElementById('ldHero');
+  hero.style.background=l.color;
+  document.getElementById('ldEmoji').textContent=l.emoji;
+  document.getElementById('ldTitle').textContent=l.title;
+  document.getElementById('ldSub').textContent=l.level+' · '+l.duration;
+  document.getElementById('ldIntro').textContent=l.intro;
+  const signsEl=document.getElementById('ldSigns');
+  signsEl.innerHTML=l.signs.map(s=>`
+    <div class="sign-card">
+      <div class="sign-card-header">
+        <div class="sign-emoji-big">${s.emoji}</div>
+        <div><div class="sign-name">${s.name}</div><div class="sign-phonetic">${s.phonetic}</div></div>
+      </div>
+      <ul class="sign-steps">${s.steps.map((st,i)=>`<li class="sign-step"><span class="step-num">${i+1}</span><span>${st}</span></li>`).join('')}</ul>
+      ${s.tip?`<div class="tip-box">💡 Tip: ${s.tip}</div>`:''}
+    </div>`).join('');
+  document.getElementById('lv-detail').style.display='flex';
+}
+
+function markDone(){
+  if(!currentLesson)return;
+  const was=doneLessons.has(currentLesson.id);
+  doneLessons.add(currentLesson.id);
+  if(!was){points+=50;showToast('🎉 Lesson complete! +50 points');}
+  else showToast('✅ Already completed!');
+  updateProgress();renderLessons();
+}
+
+function updateProgress(){
+  const pct=Math.round(doneLessons.size/LESSONS.length*100);
+  document.getElementById('overallPct').textContent=pct+'%';
+  document.getElementById('overallBar').style.width=pct+'%';
+  document.getElementById('doneCount').textContent=doneLessons.size;
+  document.getElementById('pointsCount').textContent=points;
+}
+
+// ─── ALPHABET ───────────────────────────────────────────
+function renderAlpha(){
+  const grid=document.getElementById('alphaGrid');
+  if(grid.children.length)return;
+  Object.keys(ALPHA).forEach(letter=>{
+    const d=ALPHA[letter];
+    const el=document.createElement('div');
+    el.className='alpha-card';
+    el.innerHTML=`<div class="a-hand">${d.e}</div><div class="a-letter">${letter}</div>`;
+    el.onclick=()=>selectAlpha(letter,d,el);
+    grid.appendChild(el);
+  });
+}
+
+function selectAlpha(letter,d,el){
+  document.querySelectorAll('.alpha-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedAlpha=letter;
+  document.getElementById('adEmoji').textContent=d.e;
+  document.getElementById('adLetter').textContent='Letter '+letter;
+  document.getElementById('adDesc').textContent=d.d;
+  document.getElementById('alphaDetail').style.display='block';
+}
+
+function speakLetter(){
+  if(!selectedAlpha)return;
+  const u=new SpeechSynthesisUtterance(selectedAlpha);
+  u.lang='en-US';u.rate=0.8;
+  speechSynthesis.cancel();speechSynthesis.speak(u);
+}
+
+// ─── FLASHCARDS ─────────────────────────────────────────
+function loadDeck(){
+  const key=document.getElementById('deckSelect').value;
+  fcDeck=[...DECKS[key]];fcIdx=0;fcFlipped=false;fcKnown=0;fcAgain=0;
+  document.getElementById('fcResult').style.display='none';
+  document.getElementById('fcCard').style.display='flex';
+  document.getElementById('fcNavF').style.display='flex';
+  document.getElementById('fcNavB').style.display='none';
+  updateFcStats();showFcCard();
+}
+function shuffleDeck(){
+  for(let i=fcDeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[fcDeck[i],fcDeck[j]]=[fcDeck[j],fcDeck[i]];}
+  fcIdx=0;fcFlipped=false;document.getElementById('fcNavB').style.display='none';document.getElementById('fcNavF').style.display='flex';
+  showFcCard();showToast('🔀 Deck shuffled!');
+}
+function showFcCard(){
+  if(fcIdx>=fcDeck.length){showFcResult();return;}
+  const c=fcDeck[fcIdx];
+  document.getElementById('fcEmoji').textContent=c.e;
+  document.getElementById('fcWord').textContent=c.w;
+  document.getElementById('fcBEmoji').textContent=c.e;
+  document.getElementById('fcBWord').textContent=c.w;
+  document.getElementById('fcDesc').textContent=c.d;
+  document.getElementById('fcFront').style.display='block';
+  document.getElementById('fcBack').style.display='none';
+  document.getElementById('fcHint').textContent='Tap to flip';
+  document.getElementById('fcCounter').textContent=`Card ${fcIdx+1} of ${fcDeck.length}`;
+  document.getElementById('fcNavF').style.display='flex';
+  document.getElementById('fcNavB').style.display='none';
+  fcFlipped=false;
+}
+function flipCard(){
+  if(fcIdx>=fcDeck.length)return;
+  if(!fcFlipped){
+    document.getElementById('fcFront').style.display='none';
+    document.getElementById('fcBack').style.display='flex';
+    document.getElementById('fcHint').textContent='How well did you know it?';
+    document.getElementById('fcNavF').style.display='none';
+    document.getElementById('fcNavB').style.display='flex';
+    fcFlipped=true;
+  }
+}
+function rateCard(knew){
+  if(knew){fcKnown++;showToast('✅ Great!');}
+  else{fcDeck.push(fcDeck[fcIdx]);fcAgain++;showToast('🔁 Added to review');}
+  fcIdx++;updateFcStats();showFcCard();
+}
+function updateFcStats(){
+  document.getElementById('fcKnown').textContent=fcKnown;
+  document.getElementById('fcAgain').textContent=fcAgain;
+  document.getElementById('fcLeft').textContent=Math.max(0,fcDeck.length-fcIdx);
+}
+function showFcResult(){
+  document.getElementById('fcCard').style.display='none';
+  document.getElementById('fcNavF').style.display='none';
+  document.getElementById('fcNavB').style.display='none';
+  const total=fcKnown+fcAgain||1;
+  const pct=Math.round(fcKnown/total*100);
+  document.getElementById('fcResult').style.display='block';
+  document.getElementById('fcResult').innerHTML=`<div style="font-size:40px;margin-bottom:8px">${pct>=80?'🏆':pct>=50?'👍':'💪'}</div><h3 style="font-size:17px;font-weight:700;margin-bottom:6px">${pct>=80?'Excellent!':pct>=50?'Good progress!':'Keep going!'}</h3><p style="font-size:13px;color:var(--muted);margin-bottom:14px">Got <strong>${fcKnown}</strong> of <strong>${total}</strong> correct (${pct}%)</p><button class="btn btn-primary btn-sm" onclick="loadDeck()">🔄 Restart</button>`;
+  points+=fcKnown*5;updateProgress();
+}
+
+// ─── QUIZ ───────────────────────────────────────────────
+function startQuiz(){
+  quizQs=[...QUIZ_POOL].sort(()=>Math.random()-.5).slice(0,6);
+  quizIdx=0;quizScore=0;quizAnswered=false;
+  document.getElementById('quizResult').style.display='none';
+  document.getElementById('quizCard').style.display='block';
+  renderQuestion();
+}
+function renderQuestion(){
+  if(quizIdx>=quizQs.length){showQuizResult();return;}
+  const q=quizQs[quizIdx];
+  quizAnswered=false;
+  document.getElementById('qNum').textContent=`Q ${quizIdx+1}/${quizQs.length}`;
+  document.getElementById('qProg').style.width=(quizIdx/quizQs.length*100)+'%';
+  document.getElementById('qScore').textContent=quizScore+' pts';
+  document.getElementById('qEmoji').textContent=q.e;
+  document.getElementById('qQ').textContent=q.q;
+  document.getElementById('qNext').style.display='none';
+  const fb=document.getElementById('qFb');fb.className='qfb';fb.textContent='';
+  const shuffled=[...q.opts].sort(()=>Math.random()-.5);
+  document.getElementById('qOpts').innerHTML=shuffled.map(o=>`<button class="qopt" onclick="answerQ('${o}','${q.a}',this)">${o}</button>`).join('');
+}
+function answerQ(chosen,correct,btn){
+  if(quizAnswered)return;quizAnswered=true;
+  document.querySelectorAll('.qopt').forEach(b=>{b.classList.add('dis');if(b.textContent===correct)b.classList.add('correct');});
+  const fb=document.getElementById('qFb');
+  if(chosen===correct){btn.classList.add('correct');quizScore+=10;fb.textContent='✅ Correct! +10 points';fb.classList.add('show','ok');points+=10;updateProgress();}
+  else{btn.classList.add('wrong');fb.textContent=`❌ Correct answer: ${correct}`;fb.classList.add('show','bad');}
+  document.getElementById('qScore').textContent=quizScore+' pts';
+  document.getElementById('qNext').style.display='flex';
+}
+function nextQ(){quizIdx++;renderQuestion();}
+function showQuizResult(){
+  document.getElementById('quizCard').style.display='none';
+  const pct=Math.round(quizScore/(quizQs.length*10)*100);
+  document.getElementById('quizResult').style.display='block';
+  document.getElementById('qREmoji').textContent=pct>=80?'🏆':pct>=50?'👍':'💪';
+  document.getElementById('qRTitle').textContent=pct>=80?'Excellent!':pct>=50?'Good job!':'Keep learning!';
+  document.getElementById('qRScore').textContent=quizScore+'/'+(quizQs.length*10);
+  document.getElementById('qRMsg').textContent=pct>=80?'You are ready to help deaf customers confidently.':pct>=50?'Good progress – review the flashcards for the signs you missed.':'Practice flashcards more then try the quiz again – you can do it!';
+}
+
+// ─── CAMERA ─────────────────────────────────────────────
+async function startCamera(){
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    document.getElementById('videoEl').srcObject=camStream;
+    document.getElementById('camOverlay').style.display='none';
+    document.getElementById('liveBadge').classList.add('show');
+    document.getElementById('startCamBtn').disabled=true;
+    document.getElementById('stopCamBtn').disabled=false;
+    detectInterval=setInterval(()=>simulateDetect(),7000);
+  }catch(e){showToast('Camera access denied – check browser permissions');}
+}
+function stopCamera(){
+  if(camStream)camStream.getTracks().forEach(t=>t.stop());
+  clearInterval(detectInterval);camStream=null;
+  document.getElementById('camOverlay').style.display='flex';
+  document.getElementById('liveBadge').classList.remove('show');
+  document.getElementById('startCamBtn').disabled=false;
+  document.getElementById('stopCamBtn').disabled=true;
+  document.getElementById('confBar').style.width='0';
+  document.getElementById('confLabel').textContent='–';
+}
+function simulateDetect(){
+  const phrase=PHRASES[Math.floor(Math.random()*PHRASES.length)];
+  const conf=Math.round(85+Math.random()*13);
+  document.getElementById('resultPh').style.display='none';
+  document.getElementById('resultText').firstChild.textContent=phrase;
+  document.getElementById('confBar').style.width=conf+'%';
+  document.getElementById('confLabel').textContent=conf+'%';
+  if(document.getElementById('autoSpeak').checked)speakText(phrase,document.getElementById('outputLang').value);
+}
+function speakResult(){const t=document.getElementById('resultText').textContent;if(t&&!t.includes('will appear'))speakText(t,document.getElementById('outputLang').value);}
+function speakGlove(){const t=document.getElementById('gloveResult').textContent;if(t&&!t.includes('Waiting'))speakText(t,'en');}
+function speakText(text,lang){
+  if(!window.speechSynthesis)return;
+  const u=new SpeechSynthesisUtterance(text);
+  const lm={id:'id-ID',en:'en-US',ms:'ms-MY',zh:'zh-CN',ar:'ar-SA',hi:'hi-IN',ja:'ja-JP',ko:'ko-KR',fr:'fr-FR',es:'es-ES'};
+  u.lang=lm[lang]||'en-US';
+  const s=document.getElementById('speedSel').value;
+  u.rate=s==='Slow'?0.7:s==='Fast'?1.4:1;
+  u.volume=document.getElementById('volSlider').value/100;
+  speechSynthesis.cancel();speechSynthesis.speak(u);
+}
+
+// ─── GLOVE ──────────────────────────────────────────────
+function connectGlove(){
+  const dot=document.getElementById('statusDot'),txt=document.getElementById('statusText');
+  dot.className='status-dot blink';txt.textContent='Connecting via Bluetooth...';
+  setTimeout(()=>{
+    dot.className='status-dot on';txt.textContent='Connected – Smart Glove v2.1';
+    showToast('🧤 Glove connected!');
+    const GP=["Hello, how can I help?","I need assistance","Where is this product?","Can I try this on?","Thank you"];
+    gloveInterval=setInterval(()=>{
+      ['f1','f2','f3','f4','f5'].forEach(id=>document.getElementById(id).textContent=Math.round(Math.random()*100)+'%');
+      if(Math.random()>.6){
+        const p=GP[Math.floor(Math.random()*GP.length)];
+        document.getElementById('gloveResult').textContent=p;
+        if(document.getElementById('autoSpeak')?.checked)speakText(p,'en');
+      }
+    },900);
+  },2500);
+}
+
+// ─── MISC ───────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
+function triggerInstall(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;});}
+  else showToast('ℹ️ Open in Chrome and tap "Add to Home Screen"');
+}
+
+// ─── INIT ────────────────────────────────────────────────
+renderLessons();
+</script>
+</body>
+</html>
